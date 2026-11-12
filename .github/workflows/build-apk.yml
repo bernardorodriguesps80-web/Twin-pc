@@ -1,28 +1,33 @@
 
-plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-}
+name: Build APK
 
-android {
-    namespace = "com.twinpc.app"
-    compileSdk = 35
+on:
+  push:
+    branches:
+      - main
 
-    defaultConfig {
-        applicationId = "com.twinpc.app"
-        minSdk = 23
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-    }
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-}
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Gerar APK
+        run: gradle assembleDebug
+
+      - name: Salvar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Twin-PC-APK
+          path: app/build/outputs/apk/debug/*.apk
